@@ -91,7 +91,7 @@ int main(void)
     int flag = -1;
     // 初始化
     LOGV("初始化...")
-    List accounts, users, vaccines;
+    List accounts,users,vaccines;
     if (!InitList(accounts))
         LOGE("账户列表初始化失败")
     if (!InitList(users))
@@ -104,9 +104,9 @@ int main(void)
         LOGE("账号文件打开失败");
     while (!feof(fp))
     {
-        Account *a = new Account;
+        Account *a = new Account();
         fscanf(fp, "%d %s %s %c\n", &(a->id), a->mail, a->passwd, &(a->role));
-        InsertElem(accounts, a);
+        InsertElem(accounts, (void*)a);
     }
     fclose(fp);
     fp = fopen(USERDATA, "rb");
@@ -114,20 +114,18 @@ int main(void)
         LOGE("用户文件打开失败");
     while (!feof(fp))
     {
-        User *u = new User;
+        User *u = new User();
         fscanf(fp, "%d %s %d %c %s %s %s\n", &(u->uid), u->name, &(u->age), &(u->gender), u->phone, u->disease, u->allergy);
-        InsertElem(users, u);
+        InsertElem(users, (void*)u);
     }
     fclose(fp);
 
-    for(List l = users->next; l != NULL; l = l->next){
-        printf("NAME:%s\n",((User*)(l->data))->name);
-    }
+
     // 登录
     // Account *ap;
     // if ((ap = login(accounts)))
     // {
-    //     User *up = new User;
+    //     User *up = new User();
     //     up->uid = ap->id;
     //     if (IndexElem(users, up, UserCmp, UserAsm))
     //         printf("你好,%s\n", up->name);
@@ -155,6 +153,19 @@ int main(void)
     //         }
     //     }
     // }
+    
+    for(List a = accounts->next;a != NULL;a = a->next){
+            printAccountInfo(a->data);
+            // printf("%p\n",a);
+    }
+    for(List l = users->next; l != NULL; l = l->next){
+            printUserInfo(accounts,l->data);
+            // printf("%s\t",((User*)(l->data))->name);
+            // printf("%p\n",l);
+    }
+    printf("\n");
+
+
     LOGV("退出...")
     DistroyList(accounts);
     DistroyList(users);
@@ -165,7 +176,7 @@ int main(void)
 // 初始化链表
 int InitList(List &l)
 {
-    l = new Node;
+    l = new Node();
     if (!l)
         return FALSE;
     l->data = NULL;
@@ -176,7 +187,7 @@ int InitList(List &l)
 // 头插法插入元素
 int InsertElem(List &l, void *data)
 {
-    Node *tempNode = new Node;
+    Node *tempNode = new Node();
     if (!tempNode)
         return FALSE;
     tempNode->data = data;
@@ -297,7 +308,7 @@ void printUserInfo(List &l, void *data)
 
 Account *login(List &accounts)
 {
-    Account *ap = new Account;
+    Account *ap = new Account();
     static int LOGINCOUNT = 1;
     char mail[21], passwd[21];
     if (LOGINCOUNT > 3)
