@@ -9,6 +9,6 @@
 
 /data 存放数据文件
 
-  /account.txt
+    /account.txt
   
-  /user.txt
+    /user.txt
