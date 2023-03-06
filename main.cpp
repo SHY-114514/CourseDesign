@@ -19,6 +19,7 @@
         scanf("%d", &flag);                            \
     }
 
+
 typedef struct
 {
     long id;              // 主键
