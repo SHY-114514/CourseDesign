@@ -7,8 +7,8 @@
 
 /server.cpp 若是时间足够，将项目分为S/C（Server端和Client端）
 
-/data 存放数据文件
+/data/ 存放数据文件
 
-    /account.txt
+/data/account.txt
   
-    /user.txt
+/data/user.txt
