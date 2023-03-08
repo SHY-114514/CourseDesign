@@ -26,5 +26,8 @@
 
 ##### 修改BUG
 
-1、使用 `DistroyList()` 函数释放 `users` 单链表时，程序出现 <span style="color:red;">Unknown signal</span> 错误（未解决）
+1、使用 `DistroyList()` 函数释放 `users` 单链表时，程序出现 `Unknown signal` 错误
 
+错误原因：非法访问已经释放的指针
+
+解决方法：多定义一个指针，在释放之前先迭代

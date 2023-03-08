@@ -1,0 +1,32 @@
+.front{
+    background-color: rgb(129, 149, 167);
+    position: relative;
+    height: 30px;
+}
+#name{
+    display: inline-block;
+    position: absolute;
+    right: 30px;
+}
+img{
+    position: relative;
+    top: 10px; 
+    height: auto; 
+    width: auto\9;
+    width:75%;
+}
+.introduce{
+    float: right;
+    width: 23%;
+    height: auto;
+}
+.introduce > p{
+    background-color: transparent;
+    text-align: inherit;
+    text-transform: inherit;
+    white-space: inherit;
+    word-spacing: normal;
+    caret-color: auto;
+    font-size: 15px;
+    position: relative;
+}
