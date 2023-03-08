@@ -62,122 +62,6 @@ typedef struct _LinkedList
 } Node, *List; // 链表结构
 
 // 初始化链表
-int InitList(List &l);
-// 头插法插入元素
-int InsertElem(List &l, void *data);
-// 判断Account是否相等
-int AccountCmp(void *datap1, void *datap2);
-// Account赋值函数
-void AccountAsm(Node *n, void *p);
-// 用户节点比较函数
-int UserCmp(void *data1, void *data2);
-void UserAsm(Node *np, void *p);
-// 删除元素
-int Delete(List &l, void *data, int (*equal)(void *, void *));
-// 定位元素
-int IndexElem(List &l, void *data, int (*equal)(void *, void *), void (*value)(Node *, void *));
-// 销毁链表
-void DistroyList(List &l,void (*clear)(void*));
-// 打印账户信息
-void printAccountInfo(void *data);
-// 打印用户信息
-void printUserInfo(List &l, void *data);
-// 登录
-Account *login(List &accounts);
-void DistroyActNode(void* data){
-    Account* node = (Account*)data;
-    delete node;
-}
-void DistroyUserNode(void* data){
-    User* node = (User*)data;
-    delete node;
-}
-
-
-int main(void)
-{
-
-    int flag = -1;
-    // 初始化
-    LOGV("初始化...")
-    List accounts,users,vaccines;
-    if (!InitList(accounts))
-        LOGE("账户列表初始化失败")
-    if (!InitList(users))
-        LOGE("用户列表初始化失败")
-
-    // 读取数据
-    LOGV("加载数据...")
-    FILE *fp = fopen(ACCOUNTDATA, "rb");
-    if (!fp)
-        LOGE("账号文件打开失败");
-    while (!feof(fp))
-    {
-        Account *a = new Account();
-        fscanf(fp, "%d %s %s %c\n", &(a->id), a->mail, a->passwd, &(a->role));
-        InsertElem(accounts, (void*)a);
-    }
-    fclose(fp);
-    fp = fopen(USERDATA, "rb");
-    if (!fp)
-        LOGE("用户文件打开失败");
-    while (!feof(fp))
-    {
-        User *u = new User();
-        fscanf(fp, "%d %s %d %c %s %s %s\n", &(u->uid), u->name, &(u->age), &(u->gender), u->phone, u->disease, u->allergy);
-        InsertElem(users, (void*)u);
-    }
-    fclose(fp);
-
-
-    // 登录
-    // Account *ap;
-    // if ((ap = login(accounts)))
-    // {
-    //     User *up = new User();
-    //     up->uid = ap->id;
-    //     if (IndexElem(users, up, UserCmp, UserAsm))
-    //         printf("你好,%s\n", up->name);
-    //     else
-    //         flag = FALSE;
-    //     // 查看个人信息
-    //     // 注册账号
-    //     // 修改密码
-    //     // 添加信息（账号+用户信息）
-    //     // 查看疫苗信息
-    //     // 预约疫苗
-    //     // 添加删除疫苗信息
-    //     // 退出登录
-    //     while (flag)
-    //     {
-    //         printf("【0】退出\t【1】查看个人信息\n");
-    //         PRINT(up->name, flag)
-    //         switch (flag)
-    //         {
-    //         case 1:
-    //             printUserInfo(accounts, up);
-    //             break;
-    //         default:
-    //             break;
-    //         }
-    //     }
-    // }
-    
-    for(List a = accounts->next;a != NULL;a = a->next){
-            printAccountInfo(a->data);
-            // printf("%p\n",a);
-    }
-    printf("\n");
-
-
-    LOGV("退出...")
-    DistroyList(accounts,DistroyActNode);
-    DistroyList(users,DistroyUserNode);
-
-    return 0;
-}
-
-// 初始化链表
 int InitList(List &l)
 {
     l = new Node();
@@ -329,3 +213,96 @@ Account *login(List &accounts)
     login(accounts);
     return NULL;
 }
+void DistroyActNode(void* data){
+    Account* node = (Account*)data;
+    delete node;
+}
+void DistroyUserNode(void* data){
+    User* node = (User*)data;
+    delete node;
+}
+
+
+int main(void)
+{
+
+    int flag = -1;
+    // 初始化
+    LOGV("初始化...")
+    List accounts,users,vaccines;
+    if (!InitList(accounts))
+        LOGE("账户列表初始化失败")
+    if (!InitList(users))
+        LOGE("用户列表初始化失败")
+
+    // 读取数据
+    LOGV("加载数据...")
+    FILE *fp = fopen(ACCOUNTDATA, "rb");
+    if (!fp)
+        LOGE("账号文件打开失败");
+    while (!feof(fp))
+    {
+        Account *a = new Account();
+        fscanf(fp, "%d %s %s %c\n", &(a->id), a->mail, a->passwd, &(a->role));
+        InsertElem(accounts, (void*)a);
+    }
+    fclose(fp);
+    fp = fopen(USERDATA, "rb");
+    if (!fp)
+        LOGE("用户文件打开失败");
+    while (!feof(fp))
+    {
+        User *u = new User();
+        fscanf(fp, "%d %s %d %c %s %s %s\n", &(u->uid), u->name, &(u->age), &(u->gender), u->phone, u->disease, u->allergy);
+        InsertElem(users, (void*)u);
+    }
+    fclose(fp);
+
+
+    // 登录
+    // Account *ap;
+    // if ((ap = login(accounts)))
+    // {
+    //     User *up = new User();
+    //     up->uid = ap->id;
+    //     if (IndexElem(users, up, UserCmp, UserAsm))
+    //         printf("你好,%s\n", up->name);
+    //     else
+    //         flag = FALSE;
+    //     // 查看个人信息
+    //     // 注册账号
+    //     // 修改密码
+    //     // 添加信息（账号+用户信息）
+    //     // 查看疫苗信息
+    //     // 预约疫苗
+    //     // 添加删除疫苗信息
+    //     // 退出登录
+    //     while (flag)
+    //     {
+    //         printf("【0】退出\t【1】查看个人信息\n");
+    //         PRINT(up->name, flag)
+    //         switch (flag)
+    //         {
+    //         case 1:
+    //             printUserInfo(accounts, up);
+    //             break;
+    //         default:
+    //             break;
+    //         }
+    //     }
+    // }
+    
+    for(List a = accounts->next;a != NULL;a = a->next){
+            printAccountInfo(a->data);
+            // printf("%p\n",a);
+    }
+    printf("\n");
+
+
+    LOGV("退出...")
+    DistroyList(accounts,DistroyActNode);
+    DistroyList(users,DistroyUserNode);
+
+    return 0;
+}
+
