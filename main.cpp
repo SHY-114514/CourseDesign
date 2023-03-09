@@ -194,38 +194,59 @@ void ListClear(List &l)
         delete q;
     }
 }
-
-int login(List &accounts)
-{
+int auth(List &accounts,List &users){
     if (LOGINCNT > 3){
         LOGW("验证失败次数过多，禁止登录，若忘记密码，请联系管理员修改密码")
         return FALSE;
     }
-    char msg[21];
     Data data;
+    char msg[31];
+    int option = 2;
     data.account.id = 0;
-    List p = accounts->next;
-    printf("请输入账号:");
+    printf("\t\t身份验证\n\t【1】注册\t【2】登录\n");
+    PRINT("请输入操作",option);
+    printf("请输入邮箱:\n");
     scanf("%s", data.account.mail);
-    if (!ListLocate(accounts, &data))
-    {
-        sprintf(msg, "账号不存在(%d/3)", LOGINCNT);
-        LOGW(msg)
-        LOGINCNT += 1;
-        return login(accounts);
+    ListLocate(accounts,&data);
+    if(option == 1){
+        // 匹配失败
+        if(data.account.id != 0){
+            LOGW("账号已存在,请直接登录")
+            return auth(accounts,users);
+        }
+        printf("请输入密码:\n");
+        scanf("%s",data.account.passwd);
+        data.account.id = accounts->next->data.account.id +1;
+        data.account.role = '0';
+        if(ListInsert(accounts,data)){
+            printf("注册成功,请登录\n");
+        }else{
+            LOGW("注册失败,内存分配失败")
+            return FALSE;
+        }
+        return auth(accounts,users);
+    }else{
+        if (data.account.id == 0)
+        {
+            sprintf(msg, "账号不存在(%d/3)", LOGINCNT);
+            LOGW(msg)
+            LOGINCNT += 1;
+            return auth(accounts,users);
+        }
+        printf("请输入密码:");
+        scanf("%s", msg);
+        if (strcmp(data.account.passwd, msg) != 0)
+        {
+            sprintf(msg, "密码错误(%d/3)", LOGINCNT);
+            LOGW(msg)
+            LOGINCNT += 1;
+            return auth(accounts,users);
+        }
+        LOGV("登录成功")
+        return data.account.id;
     }
-    printf("请输入密码:");
-    scanf("%s", msg);
-    if (strcmp(data.account.passwd, msg) != 0)
-    {
-        sprintf(msg, "密码错误(%d/3)", LOGINCNT);
-        LOGW(msg)
-        LOGINCNT += 1;
-        return login(accounts);
-    }
-    LOGV("登录成功")
-    return data.account.id;
 }
+
 
 int main(void)
 {
@@ -257,12 +278,13 @@ int main(void)
     }
     fclose(fp);
 
-    
+
     Data _dt;
-    _dt.user.uid = login(accounts);
+    _dt.user.uid = auth(accounts,users);
     if(_dt.user.uid == FALSE){ quit = TRUE;}
     ListLocate(users, &_dt);
-    ListPrint(_dt,DTTPUSR);
+    
+    
 
     while (!quit)
     {
