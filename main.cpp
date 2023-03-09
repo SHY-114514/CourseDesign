@@ -111,7 +111,7 @@ int ListLocate(List &l, Data *dp)
     List p = l->next;
     while (p)
     {
-        if (l->type == DTTPACT)
+        if (l->type == DTTPACT){
             if (p->data.account.id == dp->account.id || strcmp(p->data.account.mail, dp->account.mail) == 0)
             {
                 dp->account.id = p->data.account.id;
@@ -120,19 +120,18 @@ int ListLocate(List &l, Data *dp)
                 dp->account.role = p->data.account.role;
                 return TRUE;
             }
-            else if (l->type == DTTPUSR)
+        }else if (l->type == DTTPUSR){
+            if (p->data.user.uid == dp->user.uid)
             {
-                if (p->data.user.uid == dp->user.uid)
-                {
-                    dp->user.uid = p->data.user.uid;
-                    strcpy(dp->user.name, p->data.user.name);
-                    dp->user.age = p->data.user.age;
-                    dp->user.gender = p->data.user.gender;
-                    strcpy(dp->user.phone, p->data.user.phone);
-                    strcpy(dp->user.disease, p->data.user.disease);
-                    strcpy(dp->user.allergy, p->data.user.allergy);
-                }
+                dp->user.uid = p->data.user.uid;
+                strcpy(dp->user.name, p->data.user.name);
+                dp->user.age = p->data.user.age;
+                dp->user.gender = p->data.user.gender;
+                strcpy(dp->user.phone, p->data.user.phone);
+                strcpy(dp->user.disease, p->data.user.disease);
+                strcpy(dp->user.allergy, p->data.user.allergy);
             }
+        }
         p = p->next;
     }
     return FALSE;
@@ -157,7 +156,7 @@ void ListPrints(List &l)
     {
         if (l->type == DTTPACT)
         {
-            printf("ID:%ld\t权限:%d\n邮箱:%s\n密码:%s\n", p->data.account.id, p->data.account.role, p->data.account.mail, p->data.account.passwd);
+            printf("ID:%ld\t权限:%c\n邮箱:%s\n密码:%s\n", p->data.account.id, p->data.account.role, p->data.account.mail, p->data.account.passwd);
             printf("**************************\n");
         }
         else if (l->type == DTTPUSR)
@@ -198,8 +197,10 @@ void ListClear(List &l)
 
 int login(List &accounts)
 {
-    if (LOGINCNT > 3)
+    if (LOGINCNT > 3){
+        LOGW("验证失败次数过多，禁止登录，若忘记密码，请联系管理员修改密码")
         return FALSE;
+    }
     char msg[21];
     Data data;
     data.account.id = 0;
@@ -256,10 +257,13 @@ int main(void)
     }
     fclose(fp);
 
+    
     Data _dt;
     _dt.user.uid = login(accounts);
-    if(_dt.user.uid == FALSE) quit = TRUE;
+    if(_dt.user.uid == FALSE){ quit = TRUE;}
     ListLocate(users, &_dt);
+    ListPrint(_dt,DTTPUSR);
+
     while (!quit)
     {
         printf("【0】退出系统\t【1】查看账户列表\n");
@@ -271,6 +275,9 @@ int main(void)
             break;
         case 1:
             ListPrints(accounts);
+            break;
+        case 2:
+            ListPrints(users);
             break;
         }
     }
