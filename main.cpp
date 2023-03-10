@@ -106,6 +106,33 @@ int ListInsert(List &l, Data &data)
     l->next = np;
     return TRUE;
 }
+int ListUpdate(List &l,Data *dp){
+    List p = l->next;
+    while (p)
+    {
+        if (l->type == DTTPACT){
+            if (p->data.account.id == dp->account.id || strcmp(p->data.account.mail, dp->account.mail) == 0)
+            {
+                strcpy(p->data.account.mail,dp->account.mail);
+                strcpy(p->data.account.passwd,dp->account.passwd);
+                p->data.account.role = dp->account.role;
+                return TRUE;
+            }
+        }else if (l->type == DTTPUSR){
+            if (p->data.user.uid == dp->user.uid)
+            {
+                strcpy(p->data.user.name, dp->user.name);
+                p->data.user.age = dp->user.age;
+                p->data.user.gender = dp->user.gender;
+                strcpy(p->data.user.phone, dp->user.phone);
+                strcpy(p->data.user.disease, dp->user.disease);
+                strcpy(p->data.user.allergy, dp->user.allergy);
+            }
+        }
+        p = p->next;
+    }
+    return FALSE;
+}
 int ListLocate(List &l, Data *dp)
 {
     List p = l->next;
@@ -218,6 +245,13 @@ int auth(List &accounts,List &users){
         scanf("%s",data.account.passwd);
         data.account.id = accounts->next->data.account.id +1;
         data.account.role = '0';
+        // Data userInfo;
+        // userInfo.user.uid = data.account.id;
+        // printf("请输入姓名:\n");
+        // scanf("%s",userInfo.user.name);
+        // printf("请输入年龄:\n");
+        // scanf("%d",userInfo.user.age);
+
         if(ListInsert(accounts,data)){
             printf("注册成功,请登录\n");
         }else{
@@ -250,8 +284,10 @@ int auth(List &accounts,List &users){
 
 int main(void)
 {
+    char str[31];
     int option = FALSE, quit = FALSE;
     LOGV("初始化")
+    LOGV("读取数据")
     List accounts, users;
     if (!ListInit(accounts, DTTPACT))
         LOGE("账号列表初始化失败")
@@ -278,17 +314,16 @@ int main(void)
     }
     fclose(fp);
 
-
+    LOGV("身份验证")
     Data _dt;
     _dt.user.uid = auth(accounts,users);
     if(_dt.user.uid == FALSE){ quit = TRUE;}
     ListLocate(users, &_dt);
-    
-    
+    LOGINCNT = 1;
 
     while (!quit)
     {
-        printf("【0】退出系统\t【1】查看账户列表\n");
+        printf("\n\n【0】退出系统\t\t【1】退出登录\n【2】修改密码\t\t【3】查看个人信息\n【4】查看疫苗信息\t【5】接种预约\n\n");
         PRINT(_dt.user.name, option);
         switch (option)
         {
@@ -296,10 +331,28 @@ int main(void)
             quit = TRUE;
             break;
         case 1:
-            ListPrints(accounts);
+            LOGINCNT = 1;
+            _dt.user.uid = auth(accounts,users);
+            if(_dt.user.uid == FALSE){ quit = TRUE; }
+            ListLocate(users,&_dt);
             break;
         case 2:
-            ListPrints(users);
+            LOGINCNT = 1;
+            LOGW("请验证当前密码:");
+            scanf("%s",str);
+            _dt.account.id = _dt.user.uid;
+            ListLocate(accounts,&_dt);
+            if(strcmp(_dt.account.passwd,str) != 0){
+                LOGW("验证失败")
+            }else{
+                LOGV("请输入新密码:")
+                scanf("%s",_dt.account.passwd);
+                if(ListUpdate(accounts,&_dt)){
+                    LOGW("当前账号密码已经更改")
+                }
+            }
+            _dt.user.uid = _dt.account.id;
+            ListLocate(users,&_dt);
             break;
         }
     }
