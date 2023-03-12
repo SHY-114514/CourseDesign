@@ -172,7 +172,7 @@ void ListPrint(Data data, int type)
     }
     else if (type == DTTPUSR)
     {
-        printf("UID:%d\t姓名:%s\t年龄:%d\t性别:%c\n手机号:%s\n历史疾病:%s\n过敏信息:%s\n", data.user.uid, data.user.name, data.user.age, data.user.gender, data.user.phone, data.user.disease, data.user.allergy);
+        printf("UID:%d\t姓名:%s\n年龄:%d\t性别:%d\n手机号:%s\n历史疾病:%s\n过敏信息:%s\n", data.user.uid, data.user.name, data.user.age, data.user.gender, data.user.phone, data.user.disease, data.user.allergy);
         printf("**************************\n");
     }
 }
@@ -188,7 +188,7 @@ void ListPrints(List &l)
         }
         else if (l->type == DTTPUSR)
         {
-            printf("UID:%d\t姓名:%s\t年龄:%d\t性别:%c\n手机号:%s\n历史疾病:%s\n过敏信息:%s\n", p->data.user.uid, p->data.user.name, p->data.user.age, p->data.user.gender, p->data.user.phone, p->data.user.disease, p->data.user.allergy);
+            printf("UID:%d\t姓名:%s\t年龄:%d\t性别:%d\n手机号:%s\n历史疾病:%s\n过敏信息:%s\n", p->data.user.uid, p->data.user.name, p->data.user.age, p->data.user.gender, p->data.user.phone, p->data.user.disease, p->data.user.allergy);
             printf("**************************\n");
         }
         p = p->next;
@@ -245,14 +245,20 @@ int auth(List &accounts,List &users){
         scanf("%s",data.account.passwd);
         data.account.id = accounts->next->data.account.id +1;
         data.account.role = '0';
-        // Data userInfo;
-        // userInfo.user.uid = data.account.id;
-        // printf("请输入姓名:\n");
-        // scanf("%s",userInfo.user.name);
-        // printf("请输入年龄:\n");
-        // scanf("%d",userInfo.user.age);
-
-        if(ListInsert(accounts,data)){
+        LOGW("请完善个人信息")
+        Data userInfo;
+        userInfo.user.uid = data.account.id;
+        printf("请输入姓名:\n");
+        scanf("%s",userInfo.user.name);
+        printf("请输入年龄:\n");
+        scanf("%d",&userInfo.user.age);
+        printf("请输入性别:\n");
+        scanf("%d",&userInfo.user.gender);
+        printf("请输入手机号:\n");
+        scanf("%s",userInfo.user.phone);
+        strcpy(userInfo.user.disease,"无");
+        strcpy(userInfo.user.allergy,"无");
+        if(ListInsert(accounts,data) && ListInsert(users,userInfo)){
             printf("注册成功,请登录\n");
         }else{
             LOGW("注册失败,内存分配失败")
@@ -267,7 +273,7 @@ int auth(List &accounts,List &users){
             LOGINCNT += 1;
             return auth(accounts,users);
         }
-        printf("请输入密码:");
+        printf("请输入密码:\n");
         scanf("%s", msg);
         if (strcmp(data.account.passwd, msg) != 0)
         {
@@ -323,7 +329,7 @@ int main(void)
 
     while (!quit)
     {
-        printf("\n\n【0】退出系统\t\t【1】退出登录\n【2】修改密码\t\t【3】查看个人信息\n【4】查看疫苗信息\t【5】接种预约\n\n");
+        printf("\n\n【0】退出系统\t\t【1】退出登录\n【2】修改密码\t\t【3】查看个人信息\n【4】查看疫苗信息\t【5】接种预约\n【6】添加基础疾病信息\n【7】添加过敏信息\n\n");
         PRINT(_dt.user.name, option);
         switch (option)
         {
@@ -354,6 +360,12 @@ int main(void)
             _dt.user.uid = _dt.account.id;
             ListLocate(users,&_dt);
             break;
+        case 3:
+            ListPrint(_dt,DTTPUSR); break;
+        case 4:
+            break;
+        default:
+            LOGW("非法输入")
         }
     }
 
